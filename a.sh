@@ -92,44 +92,6 @@ local genln=$1
 tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 }
 
-#function to set a user input password
-set_pass() {
-exec 3>&1 >/dev/tty
-local LOCALPASS='123456789'
-local exitvalue=0
-echo "Enter a password (6+ chars)"
-echo "or leave blank to generate a random one"
-
-while [ -z $LOCALPASS ]
-do
-  echo "Please enter the new password:"
-  read -s password1
-
-#check that password is valid
-  if [ -z $password1 ]; then
-    echo "Random password generated, will be provided to user at end of script"
-    exitvalue=1
-    LOCALPASS=$(genpasswd) && break
-  elif [ ${#password1} -lt 6 ]; then
-    echo "password needs to be at least 6 chars long" && continue
-  else
-    echo "Enter the new password again:"
-    read -s password2
-
-# Check both passwords match
-    if [ $password1 != $password2 ]; then
-      echo "Passwords do not match"
-    else
-      LOCALPASS=$password1
-    fi
-  fi
-done
-
-exec >&3-
-echo $LOCALPASS
-return $exitvalue
-}
-
 #function to determine random number between 2 numbers
 random()
 {
@@ -284,8 +246,8 @@ home=$(eval echo "~$user")
 
 #set password for rutorrent
 echo "Set Password for RuTorrent web client"
-webpass=$(set_pass)
-PASSFLAG=$?
+webpass=123456789
+PASSFLAG=1
 #Interaction ended message
 echo
 echo "No more user input required, you can complete unattended"
