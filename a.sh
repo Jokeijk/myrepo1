@@ -95,12 +95,35 @@ tr -dc A-Za-z0-9 < /dev/urandom | head -c ${genln} | xargs
 #function to set a user input password
 set_pass() {
 exec 3>&1 >/dev/tty
-local LOCALPASS=''
+local LOCALPASS='123456789'
 local exitvalue=0
 echo "Enter a password (6+ chars)"
 echo "or leave blank to generate a random one"
 
-LOCALPASS=123456789
+while [ -z $LOCALPASS ]
+do
+  echo "Please enter the new password:"
+  read -s password1
+
+#check that password is valid
+  if [ -z $password1 ]; then
+    echo "Random password generated, will be provided to user at end of script"
+    exitvalue=1
+    LOCALPASS=$(genpasswd) && break
+  elif [ ${#password1} -lt 6 ]; then
+    echo "password needs to be at least 6 chars long" && continue
+  else
+    echo "Enter the new password again:"
+    read -s password2
+
+# Check both passwords match
+    if [ $password1 != $password2 ]; then
+      echo "Passwords do not match"
+    else
+      LOCALPASS=$password1
+    fi
+  fi
+done
 
 exec >&3-
 echo $LOCALPASS
@@ -119,7 +142,7 @@ random()
 
 # function to ask user for y/n response
 ask_user(){
-return 0
+    return 0
 while true
   do
     read answer
@@ -227,7 +250,35 @@ if which rtorrent; then
 fi
 
 # set and prepare user
-  user=$USER
+SUDO_USER=root
+if [ -z "$SUDO_USER" ]; then
+  echo "Enter the name of the user to install to"
+  echo "This will be your primary user"
+  echo "It can be an existing user or a new user"
+  echo
+
+  confirm_name=1
+  while [ $confirm_name = 1 ]
+    do
+      read -p "Enter user name: " answer
+      addname=$answer
+      echo -n "Confirm that user name is $answer y/n? "
+      if ask_user; then
+        confirm_name=0
+      fi
+    done
+
+  user=$addname
+
+  if id -u $user >/dev/null 2>&1; then
+    echo "$user already exists"
+  else
+    adduser --gecos "" $user
+  fi
+
+else
+  user=$SUDO_USER
+fi
 
 home=$(eval echo "~$user")
 
@@ -313,11 +364,11 @@ fi
 echo "Completed installation of required packages        "
 
 #add user to sudo group if not already
-if groups $user | grep -q -E ' sudo(\s|$)'; then
-  echo "$user already has sudo privileges"
-else
-  adduser $user sudo
-fi
+#if groups $user | grep -q -E ' sudo(\s|$)'; then
+#  echo "$user already has sudo privileges"
+#else
+#  adduser $user sudo
+#fi
 
 # download rt scripts and config files
 echo "Fetching rtinst scripts" | tee -a $logfile
