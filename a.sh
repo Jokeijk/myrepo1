@@ -395,9 +395,9 @@ if ! [ -z "$allowlist" ]; then
 fi
 grep "AllowGroups sudo sshuser" /etc/ssh/sshd_config > /dev/null || echo "AllowGroups sudo sshuser root" >> /etc/ssh/sshd_config
 
-#service ssh restart 1>> $logfile
-#sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
-#echo "SSH port set to $sshport"
+service ssh restart 1>> $logfile
+sshport=$(grep 'Port ' /etc/ssh/sshd_config | sed 's/[^0-9]*//g')
+echo "SSH port set to $sshport"
 
 # Generate https/ssl certificates
 if [ -z "$(grep -s $serverip$ /etc/ssl/ruweb.cnf)" ]; then
