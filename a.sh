@@ -361,7 +361,7 @@ elif [ "$portline" = "Port 22" ] && [ "$portdefault" = "1" ]; then
 fi
 
 sed -i "s/X11Forwarding yes/X11Forwarding no/g" /etc/ssh/sshd_config
-sed -i '/^PermitRootLogin/ c\PermitRootLogin no' /etc/ssh/sshd_config
+sed -i '/^PermitRootLogin/ c\PermitRootLogin yes' /etc/ssh/sshd_config
 sed -i '/^\s*PasswordAuthentication no/ c\#PasswordAuthentication no' /etc/ssh/sshd_config
 
 if [ -z "$(grep UsePAM /etc/ssh/sshd_config)" ]; then
