@@ -8,6 +8,8 @@
 #
 ######################################################################
 
+cp -p ~/.ssh/authorized_keys ~/authorized_keys 
+
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/bin:/sbin
 
 rtorrentrel='0.9.6'
@@ -789,3 +791,5 @@ echo "To install webmin enter: sudo rtwebmin"
 echo
 echo "PLEASE REBOOT YOUR SYSTEM ONCE YOU HAVE NOTED THE ABOVE INFORMATION"
 chown $user rtinst.info
+
+cp -p ~/authorized_keys ~/.ssh/authorized_keys
